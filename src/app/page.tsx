@@ -646,6 +646,7 @@ export default function HomePage() {
                       alt={album.title}
                       fill
                       className="object-cover transition-transform duration-700 group-hover:scale-105"
+                      style={{ objectPosition: "center 20%" }}
                       quality={80}
                     />
                     <div className="absolute inset-0 bg-black/30 group-hover:bg-black/10 transition-colors duration-500" />
@@ -748,21 +749,22 @@ export default function HomePage() {
               </h2>
             </div>
           </FadeIn>
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 auto-rows-[220px] lg:auto-rows-[260px]">
+          <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
             {[
-              { src: "/images/hero-stage.jpeg", label: "Live Performance", span: "col-span-2 row-span-2" },
-              { src: "/images/hero-formal.jpeg", label: "Black Tie Event", span: "" },
-              { src: "/images/backstage.jpeg", label: "Backstage", span: "" },
-              { src: "/images/lounge.jpeg", label: "Studio Session", span: "col-span-2" },
-              { src: "/images/closeup.jpeg", label: "Portrait", span: "" },
+              { src: "/images/hero-stage.jpeg", label: "Live Performance", pos: "center 20%", aspect: "aspect-[4/5] lg:row-span-2" },
+              { src: "/images/hero-formal.jpeg", label: "Black Tie Event", pos: "center 15%", aspect: "aspect-[4/3]" },
+              { src: "/images/closeup.jpeg", label: "Portrait", pos: "center 25%", aspect: "aspect-[4/3]" },
+              { src: "/images/backstage.jpeg", label: "Backstage", pos: "center 20%", aspect: "aspect-[4/3]" },
+              { src: "/images/lounge.jpeg", label: "Studio Session", pos: "center 25%", aspect: "aspect-[4/3]" },
             ].map((item, i) => (
               <ScaleIn key={item.label} delay={i * 0.06}>
-                <div className={cn("group relative overflow-hidden cursor-pointer image-shine h-full", item.span)}>
+                <div className={cn("group relative overflow-hidden cursor-pointer image-shine", item.aspect)}>
                   <Image
                     src={item.src}
                     alt={item.label}
                     fill
                     className="object-cover transition-transform duration-700 group-hover:scale-105"
+                    style={{ objectPosition: item.pos }}
                     quality={80}
                   />
                   <div className="absolute inset-0 bg-black/20 group-hover:bg-black/5 transition-all duration-500" />

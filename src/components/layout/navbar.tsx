@@ -11,7 +11,7 @@ const navLinks = [
   { href: "/spotlight", label: "Spotlight" },
   { href: "#music", label: "Music" },
   { href: "#events", label: "Events" },
-  { href: "#gallery", label: "Gallery" },
+  { href: "/reviews", label: "Reviews" },
   { href: "#contact", label: "Contact" },
 ];
 
@@ -64,11 +64,11 @@ export function Navbar() {
             )}
           </div>
 
-          <a href="#booking" className="hidden md:block">
+          <Link href="/book" className="hidden md:block">
             <button className="px-7 py-2.5 text-[13px] tracking-wider uppercase font-semibold text-charcoal bg-gradient-to-r from-gold-light via-gold to-gold-dark rounded-none hover:shadow-lg hover:shadow-gold/20 transition-all duration-300 cursor-pointer">
               Book Now
             </button>
-          </a>
+          </Link>
 
           <button
             className="md:hidden text-cream p-2"
@@ -108,11 +108,11 @@ export function Navbar() {
             )
           )}
           <div className="pt-3">
-            <a href="#booking" onClick={() => setMobileOpen(false)}>
+            <Link href="/book" onClick={() => setMobileOpen(false)}>
               <button className="w-full py-3 text-[13px] tracking-wider uppercase font-semibold text-charcoal bg-gradient-to-r from-gold-light via-gold to-gold-dark cursor-pointer">
                 Book Now
               </button>
-            </a>
+            </Link>
           </div>
         </div>
       </div>

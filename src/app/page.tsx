@@ -602,11 +602,11 @@ export default function HomePage() {
           src="/images/lounge.jpeg"
           alt="Bayo in a relaxed setting with saxophone"
           fill
-          className="object-cover object-center"
+          className="object-cover object-top"
           quality={90}
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#0d0b08] via-[#0d0b08]/30 to-[#0d0b08]/60" />
-        <div className="absolute inset-0 flex items-center justify-center">
+        <div className="absolute inset-0 bg-gradient-to-t from-[#0d0b08] via-[#0d0b08]/40 to-[#0d0b08]/50" />
+        <div className="absolute inset-0 flex items-end justify-center pb-16 sm:pb-20">
           <FadeIn>
             <div className="text-center">
               <p className="text-[11px] tracking-[0.4em] uppercase text-gold mb-4">Available For</p>

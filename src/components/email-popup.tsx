@@ -3,8 +3,10 @@
 import { useState, useEffect } from "react";
 import { X, Music, ArrowRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useI18n } from "@/lib/i18n/context";
 
 export function EmailPopup() {
+  const { t } = useI18n();
   const [isOpen, setIsOpen] = useState(false);
   const [email, setEmail] = useState("");
   const [submitted, setSubmitted] = useState(false);
@@ -80,11 +82,10 @@ export function EmailPopup() {
                     </div>
 
                     <h3 className="text-2xl font-black text-center tracking-tight mb-2">
-                      Get a <span className="gradient-text-gold">Free Track</span>
+                      {t.popup.title1} <span className="gradient-text-gold">{t.popup.title2}</span>
                     </h3>
                     <p className="text-sm text-cream/40 text-center mb-8 max-w-xs mx-auto">
-                      Join the inner circle. Get an exclusive saxophone track
-                      delivered to your inbox — plus early access to shows and new releases.
+                      {t.popup.subtitle}
                     </p>
 
                     <form onSubmit={handleSubmit} className="space-y-4">
@@ -92,7 +93,7 @@ export function EmailPopup() {
                         type="email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        placeholder="Your best email"
+                        placeholder={t.popup.placeholder}
                         required
                         className="w-full px-5 py-3.5 bg-gold/[0.03] border border-gold/10 text-cream placeholder-cream/20 focus:outline-none focus:border-gold/30 transition-colors text-sm"
                       />
@@ -100,13 +101,13 @@ export function EmailPopup() {
                         type="submit"
                         className="w-full py-3.5 bg-gradient-to-r from-gold-light via-gold to-gold-dark text-charcoal font-bold text-[12px] tracking-wider uppercase hover:shadow-lg hover:shadow-gold/15 transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer"
                       >
-                        Send Me The Track
+                        {t.popup.cta}
                         <ArrowRight className="h-4 w-4" />
                       </button>
                     </form>
 
                     <p className="text-[10px] text-cream/15 text-center mt-5 tracking-wider">
-                      No spam. Unsubscribe anytime.
+                      {t.popup.noSpam}
                     </p>
                   </>
                 ) : (
@@ -117,10 +118,10 @@ export function EmailPopup() {
                       </svg>
                     </div>
                     <h3 className="text-2xl font-black tracking-tight mb-2">
-                      You&apos;re In!
+                      {t.popup.success}
                     </h3>
                     <p className="text-sm text-cream/40">
-                      Check your inbox for your free track.
+                      {t.popup.successMsg}
                     </p>
                   </div>
                 )}

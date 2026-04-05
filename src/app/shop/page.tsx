@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import {
   ArrowLeft,
   ShoppingBag,
@@ -13,11 +12,100 @@ import {
   Truck,
   Shield,
   CreditCard,
+  Disc3,
+  Disc,
+  Shirt,
+  Download,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Navbar } from "@/components/layout/navbar";
 import { cn } from "@/lib/utils";
 import { products, type Product } from "@/lib/shop-data";
+
+/* ─── Product icon renderer ─── */
+function ProductIcon({ type, className }: { type: string; className?: string }) {
+  const cls = cn("text-gold/70", className);
+  switch (type) {
+    case "vinyl":
+      return (
+        <div className="relative">
+          <Disc3 className={cn(cls, "animate-spin-slow")} />
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="h-3 w-3 rounded-full bg-gold/20" />
+          </div>
+        </div>
+      );
+    case "cd":
+      return <Disc className={cls} />;
+    case "tshirt":
+      return <Shirt className={cls} />;
+    case "hoodie":
+      return (
+        <svg className={cls} viewBox="0 0 64 64" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M22 10L10 18V30H18V54H46V30H54V18L42 10" />
+          <path d="M22 10C22 10 26 16 32 16C38 16 42 10 42 10" />
+          <path d="M22 10L26 6H38L42 10" />
+        </svg>
+      );
+    case "download":
+      return <Download className={cls} />;
+    case "cap":
+      return (
+        <svg className={cls} viewBox="0 0 64 64" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M8 36C8 36 12 24 32 24C52 24 56 36 56 36" />
+          <path d="M8 36C8 36 8 44 32 44C56 44 56 36 56 36" />
+          <path d="M56 36H62" />
+          <path d="M20 24V18C20 18 24 12 32 12C40 12 44 18 44 18V24" />
+        </svg>
+      );
+    default:
+      return <Music className={cls} />;
+  }
+}
+
+/* ─── Product visual card ─── */
+function ProductVisual({ product, size = "md" }: { product: Product; size?: "sm" | "md" }) {
+  const iconSize = size === "sm" ? "h-10 w-10" : "h-16 w-16";
+  return (
+    <div className={cn("relative bg-gradient-to-br flex items-center justify-center overflow-hidden", product.gradient, size === "sm" ? "h-full w-full" : "aspect-square w-full")}>
+      {/* Decorative circles */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[200%] h-[200%] opacity-[0.03]">
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="w-40 h-40 rounded-full border border-white" />
+        </div>
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="w-64 h-64 rounded-full border border-white" />
+        </div>
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="w-96 h-96 rounded-full border border-white" />
+        </div>
+      </div>
+      {/* Grid overlay */}
+      <div className="absolute inset-0 opacity-[0.03]" style={{
+        backgroundImage: "linear-gradient(rgba(201,168,76,1) 1px, transparent 1px), linear-gradient(90deg, rgba(201,168,76,1) 1px, transparent 1px)",
+        backgroundSize: "30px 30px",
+      }} />
+      {/* Product name watermark */}
+      <div className="absolute bottom-4 left-4 right-4">
+        <p className="text-[9px] tracking-[0.3em] uppercase text-white/10 font-bold truncate">{product.name}</p>
+      </div>
+      {/* Icon */}
+      <div className="relative z-10">
+        <ProductIcon type={product.icon} className={iconSize} />
+      </div>
+      {/* Badge */}
+      {product.badge && (
+        <div className="absolute top-3 left-3 px-3 py-1 bg-gold text-charcoal text-[9px] font-bold tracking-widest uppercase z-10">
+          {product.badge}
+        </div>
+      )}
+      {/* BAYO. branding */}
+      <div className="absolute top-3 right-3 text-[10px] font-black text-white/10 tracking-tight">
+        BAYO<span className="text-gold/20">.</span>
+      </div>
+    </div>
+  );
+}
 
 interface CartItem {
   product: Product;
@@ -43,23 +131,15 @@ export default function ShopPage() {
   const [addedId, setAddedId] = useState<string | null>(null);
 
   const categories = ["All", ...Array.from(new Set(products.map((p) => p.category)))];
-
   const filtered = filter === "All" ? products : products.filter((p) => p.category === filter);
-
   const cartTotal = cart.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
   const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
 
   const addToCart = (product: Product, variant?: string) => {
     setCart((prev) => {
-      const existing = prev.find(
-        (i) => i.product.id === product.id && i.variant === variant
-      );
+      const existing = prev.find((i) => i.product.id === product.id && i.variant === variant);
       if (existing) {
-        return prev.map((i) =>
-          i.product.id === product.id && i.variant === variant
-            ? { ...i, quantity: i.quantity + 1 }
-            : i
-        );
+        return prev.map((i) => i.product.id === product.id && i.variant === variant ? { ...i, quantity: i.quantity + 1 } : i);
       }
       return [...prev, { product, quantity: 1, variant }];
     });
@@ -68,13 +148,7 @@ export default function ShopPage() {
   };
 
   const updateQuantity = (index: number, delta: number) => {
-    setCart((prev) =>
-      prev
-        .map((item, i) =>
-          i === index ? { ...item, quantity: item.quantity + delta } : item
-        )
-        .filter((item) => item.quantity > 0)
-    );
+    setCart((prev) => prev.map((item, i) => i === index ? { ...item, quantity: item.quantity + delta } : item).filter((item) => item.quantity > 0));
   };
 
   return (
@@ -103,22 +177,16 @@ export default function ShopPage() {
                   <span className="gradient-text-gold">MERCH</span>
                 </h1>
               </div>
-              {/* Cart button */}
-              <button
-                onClick={() => setCartOpen(true)}
-                className="relative h-12 w-12 border border-gold/20 flex items-center justify-center text-cream/50 hover:text-gold hover:border-gold/40 transition-all cursor-pointer"
-              >
+              <button onClick={() => setCartOpen(true)}
+                className="relative h-12 w-12 border border-gold/20 flex items-center justify-center text-cream/50 hover:text-gold hover:border-gold/40 transition-all cursor-pointer">
                 <ShoppingBag className="h-5 w-5" />
                 {cartCount > 0 && (
-                  <span className="absolute -top-2 -right-2 h-5 w-5 bg-gold text-charcoal text-[10px] font-bold flex items-center justify-center">
-                    {cartCount}
-                  </span>
+                  <span className="absolute -top-2 -right-2 h-5 w-5 bg-gold text-charcoal text-[10px] font-bold flex items-center justify-center">{cartCount}</span>
                 )}
               </button>
             </div>
           </FadeIn>
 
-          {/* Perks */}
           <FadeIn delay={0.15}>
             <div className="flex flex-wrap gap-6 mt-10">
               {[
@@ -127,29 +195,19 @@ export default function ShopPage() {
                 { icon: <CreditCard className="h-4 w-4" />, text: "All cards accepted" },
               ].map((perk) => (
                 <div key={perk.text} className="flex items-center gap-2 text-cream/25 text-xs">
-                  <span className="text-gold/40">{perk.icon}</span>
-                  {perk.text}
+                  <span className="text-gold/40">{perk.icon}</span>{perk.text}
                 </div>
               ))}
             </div>
           </FadeIn>
 
-          {/* Category filter */}
           <FadeIn delay={0.2}>
             <div className="flex gap-2 mt-10 flex-wrap">
               {categories.map((cat) => (
-                <button
-                  key={cat}
-                  onClick={() => setFilter(cat)}
-                  className={cn(
-                    "px-5 py-2 text-[11px] tracking-wider uppercase font-medium transition-all cursor-pointer",
-                    filter === cat
-                      ? "bg-gold text-charcoal"
-                      : "border border-gold/10 text-cream/40 hover:text-gold hover:border-gold/30"
-                  )}
-                >
-                  {cat}
-                </button>
+                <button key={cat} onClick={() => setFilter(cat)}
+                  className={cn("px-5 py-2 text-[11px] tracking-wider uppercase font-medium transition-all cursor-pointer",
+                    filter === cat ? "bg-gold text-charcoal" : "border border-gold/10 text-cream/40 hover:text-gold hover:border-gold/30"
+                  )}>{cat}</button>
               ))}
             </div>
           </FadeIn>
@@ -164,40 +222,19 @@ export default function ShopPage() {
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {filtered.map((product, i) => (
               <FadeIn key={product.id} delay={i * 0.06}>
-                <div className="group border border-gold/5 hover:border-gold/15 transition-all duration-500">
-                  {/* Image */}
-                  <div
-                    className="relative aspect-square overflow-hidden cursor-pointer"
-                    onClick={() => { setSelectedProduct(product); setSelectedVariant(product.variants?.[0] || ""); }}
-                  >
-                    <Image src={product.image} alt={product.name} fill
-                      className="object-cover transition-transform duration-700 group-hover:scale-105"
-                      style={{ objectPosition: product.imagePos }} quality={80} />
-                    <div className="absolute inset-0 bg-black/20 group-hover:bg-black/5 transition-all" />
-                    {product.badge && (
-                      <div className="absolute top-3 left-3 px-3 py-1 bg-gold text-charcoal text-[9px] font-bold tracking-widest uppercase">
-                        {product.badge}
-                      </div>
-                    )}
+                <div className="group border border-gold/5 hover:border-gold/20 transition-all duration-500">
+                  <div className="cursor-pointer" onClick={() => { setSelectedProduct(product); setSelectedVariant(product.variants?.[0] || ""); }}>
+                    <ProductVisual product={product} />
                   </div>
-
-                  {/* Info */}
                   <div className="p-5">
                     <p className="text-[10px] tracking-wider uppercase text-cream/20 mb-1.5">{product.category}</p>
                     <h3 className="font-bold text-sm mb-2 group-hover:text-gold-light transition-colors">{product.name}</h3>
                     <div className="flex items-center justify-between mt-4">
                       <span className="text-xl font-black gradient-text-gold">${product.price.toFixed(2)}</span>
-                      <button
-                        onClick={() => addToCart(product, product.variants?.[0])}
-                        className={cn(
-                          "px-4 py-2 text-[10px] tracking-wider uppercase font-bold transition-all cursor-pointer",
-                          addedId === product.id
-                            ? "bg-emerald-500 text-white"
-                            : "bg-gold text-charcoal hover:shadow-lg hover:shadow-gold/15"
-                        )}
-                      >
-                        {addedId === product.id ? "Added!" : "Add to Cart"}
-                      </button>
+                      <button onClick={() => addToCart(product, product.variants?.[0])}
+                        className={cn("px-4 py-2 text-[10px] tracking-wider uppercase font-bold transition-all cursor-pointer",
+                          addedId === product.id ? "bg-emerald-500 text-white" : "bg-gold text-charcoal hover:shadow-lg hover:shadow-gold/15"
+                        )}>{addedId === product.id ? "Added!" : "Add to Cart"}</button>
                     </div>
                   </div>
                 </div>
@@ -217,53 +254,34 @@ export default function ShopPage() {
             <motion.div
               initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 40 }}
               transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-              className="fixed inset-0 z-[101] flex items-center justify-center p-4 overflow-y-auto"
-            >
+              className="fixed inset-0 z-[101] flex items-center justify-center p-4 overflow-y-auto">
               <div className="relative w-full max-w-2xl bg-[#12100c] border border-gold/15">
                 <button onClick={() => setSelectedProduct(null)}
                   className="absolute top-4 right-4 z-10 h-8 w-8 flex items-center justify-center text-cream/30 hover:text-cream transition-colors cursor-pointer">
                   <X className="h-5 w-5" />
                 </button>
                 <div className="grid sm:grid-cols-2">
-                  <div className="relative aspect-square">
-                    <Image src={selectedProduct.image} alt={selectedProduct.name} fill
-                      className="object-cover" style={{ objectPosition: selectedProduct.imagePos }} quality={80} />
-                    {selectedProduct.badge && (
-                      <div className="absolute top-3 left-3 px-3 py-1 bg-gold text-charcoal text-[9px] font-bold tracking-widest uppercase">
-                        {selectedProduct.badge}
-                      </div>
-                    )}
-                  </div>
+                  <ProductVisual product={selectedProduct} />
                   <div className="p-6 sm:p-8 flex flex-col">
                     <p className="text-[10px] tracking-wider uppercase text-cream/20 mb-2">{selectedProduct.category}</p>
                     <h3 className="text-xl font-black mb-3">{selectedProduct.name}</h3>
                     <p className="text-2xl font-black gradient-text-gold mb-4">${selectedProduct.price.toFixed(2)}</p>
                     <p className="text-sm text-cream/40 leading-relaxed mb-6 flex-1">{selectedProduct.description}</p>
-
                     {selectedProduct.variants && (
                       <div className="mb-6">
                         <p className="text-[10px] tracking-wider uppercase text-cream/30 mb-2">Size</p>
                         <div className="flex gap-2">
                           {selectedProduct.variants.map((v) => (
                             <button key={v} onClick={() => setSelectedVariant(v)}
-                              className={cn(
-                                "h-9 w-12 text-xs font-bold transition-all cursor-pointer",
-                                selectedVariant === v
-                                  ? "bg-gold text-charcoal"
-                                  : "border border-gold/10 text-cream/40 hover:border-gold/30"
+                              className={cn("h-9 w-12 text-xs font-bold transition-all cursor-pointer",
+                                selectedVariant === v ? "bg-gold text-charcoal" : "border border-gold/10 text-cream/40 hover:border-gold/30"
                               )}>{v}</button>
                           ))}
                         </div>
                       </div>
                     )}
-
-                    <button
-                      onClick={() => {
-                        addToCart(selectedProduct, selectedVariant || undefined);
-                        setSelectedProduct(null);
-                      }}
-                      className="w-full py-3.5 bg-gradient-to-r from-gold-light via-gold to-gold-dark text-charcoal font-bold text-[12px] tracking-wider uppercase hover:shadow-lg hover:shadow-gold/15 transition-all cursor-pointer flex items-center justify-center gap-2"
-                    >
+                    <button onClick={() => { addToCart(selectedProduct, selectedVariant || undefined); setSelectedProduct(null); }}
+                      className="w-full py-3.5 bg-gradient-to-r from-gold-light via-gold to-gold-dark text-charcoal font-bold text-[12px] tracking-wider uppercase hover:shadow-lg hover:shadow-gold/15 transition-all cursor-pointer flex items-center justify-center gap-2">
                       <ShoppingBag className="h-4 w-4" /> Add to Cart
                     </button>
                   </div>
@@ -284,8 +302,7 @@ export default function ShopPage() {
             <motion.div
               initial={{ x: "100%" }} animate={{ x: 0 }} exit={{ x: "100%" }}
               transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-              className="fixed top-0 right-0 bottom-0 z-[101] w-full max-w-md bg-[#12100c] border-l border-gold/10 flex flex-col"
-            >
+              className="fixed top-0 right-0 bottom-0 z-[101] w-full max-w-md bg-[#12100c] border-l border-gold/10 flex flex-col">
               <div className="p-6 border-b border-gold/5 flex items-center justify-between">
                 <h3 className="text-lg font-black flex items-center gap-2">
                   <ShoppingBag className="h-5 w-5 text-gold" /> Cart ({cartCount})
@@ -309,9 +326,8 @@ export default function ShopPage() {
                 ) : (
                   cart.map((item, i) => (
                     <div key={`${item.product.id}-${item.variant}`} className="flex gap-4 py-4 border-b border-gold/5">
-                      <div className="relative h-20 w-20 flex-shrink-0 overflow-hidden">
-                        <Image src={item.product.image} alt={item.product.name} fill
-                          className="object-cover" style={{ objectPosition: item.product.imagePos }} />
+                      <div className="h-20 w-20 flex-shrink-0 overflow-hidden">
+                        <ProductVisual product={item.product} size="sm" />
                       </div>
                       <div className="flex-1 min-w-0">
                         <h4 className="font-bold text-sm truncate">{item.product.name}</h4>

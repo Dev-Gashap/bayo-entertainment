@@ -667,6 +667,64 @@ export default function HomePage() {
               </FadeIn>
             ))}
           </div>
+          {/* ── Streaming players ── */}
+          <FadeIn delay={0.3}>
+            <div className="mt-20 pt-16 border-t border-gold/5">
+              <div className="flex items-center justify-center gap-4 mb-10">
+                <div className="h-px w-10 bg-gradient-to-r from-gold to-transparent" />
+                <span className="text-[11px] font-bold tracking-[0.35em] uppercase text-gold">
+                  Stream Now
+                </span>
+                <div className="h-px w-10 bg-gradient-to-l from-gold to-transparent" />
+              </div>
+              <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+                {/* Spotify Embed */}
+                <div className="border border-gold/10 p-5">
+                  <div className="flex items-center gap-3 mb-4">
+                    <svg className="h-5 w-5 text-[#1DB954]" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/>
+                    </svg>
+                    <span className="text-sm font-bold text-cream/70">Spotify</span>
+                  </div>
+                  <iframe
+                    src="https://open.spotify.com/embed/artist/4YRxDV8wJFPHPTeXepOstw?utm_source=generator&theme=0"
+                    width="100%"
+                    height="352"
+                    frameBorder="0"
+                    allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                    loading="lazy"
+                    className="rounded-lg"
+                  />
+                  <p className="text-[10px] text-cream/20 mt-3 text-center tracking-wider">
+                    Update with your Spotify artist link
+                  </p>
+                </div>
+
+                {/* Apple Music Embed */}
+                <div className="border border-gold/10 p-5">
+                  <div className="flex items-center gap-3 mb-4">
+                    <svg className="h-5 w-5 text-[#FC3C44]" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M23.994 6.124a9.23 9.23 0 00-.24-2.19c-.317-1.31-1.062-2.31-2.18-3.043a5.022 5.022 0 00-1.877-.726 10.496 10.496 0 00-1.564-.15c-.04-.003-.083-.01-.124-.013H5.986c-.152.01-.303.017-.455.026-.747.043-1.49.123-2.193.4-1.336.53-2.3 1.452-2.865 2.78-.192.448-.292.925-.363 1.408-.056.392-.088.785-.1 1.18 0 .032-.007.062-.01.093v12.223c.01.14.017.283.027.424.05.815.154 1.624.497 2.373.65 1.42 1.738 2.353 3.234 2.8.42.127.856.187 1.297.228.6.056 1.203.05 1.808.05h10.57c.206 0 .413-.007.618-.02.755-.044 1.505-.127 2.212-.415 1.324-.538 2.292-1.47 2.845-2.808.18-.437.28-.897.348-1.363.06-.4.09-.804.098-1.21.003-.067.01-.133.01-.2V6.125h-.003zm-7.26 5.862l-.002 5.456c0 .387-.048.763-.187 1.122-.258.666-.74 1.072-1.415 1.277-.38.114-.77.174-1.165.18-.79.013-1.49-.333-1.828-1.065-.243-.526-.233-1.065.07-1.575.35-.59.916-.876 1.564-1.015.378-.08.764-.128 1.142-.2.252-.05.496-.118.674-.31.128-.14.186-.31.186-.503v-3.892a.46.46 0 00-.333-.454 3.813 3.813 0 00-.535-.108l-3.08-.505c-.377-.063-.757-.117-1.13-.194-.512-.106-.865-.476-.924-1.003a6.66 6.66 0 01-.037-.54V5.64c0-.14.01-.28.04-.418.088-.403.37-.665.77-.743.168-.032.34-.053.51-.077l3.594-.59 1.164-.19c.27-.044.54-.098.813-.122.39-.033.7.187.788.543.028.113.042.232.042.35v6.592z"/>
+                    </svg>
+                    <span className="text-sm font-bold text-cream/70">Apple Music</span>
+                  </div>
+                  <iframe
+                    allow="autoplay *; encrypted-media *; fullscreen *; clipboard-write"
+                    frameBorder="0"
+                    height="450"
+                    width="100%"
+                    sandbox="allow-forms allow-popups allow-same-origin allow-scripts allow-storage-access-by-user-activation allow-top-navigation-by-user-activation"
+                    src="https://embed.music.apple.com/us/album/golden-hour/placeholder?theme=dark"
+                    loading="lazy"
+                    className="rounded-lg"
+                  />
+                  <p className="text-[10px] text-cream/20 mt-3 text-center tracking-wider">
+                    Update with your Apple Music artist link
+                  </p>
+                </div>
+              </div>
+            </div>
+          </FadeIn>
         </div>
       </section>
 

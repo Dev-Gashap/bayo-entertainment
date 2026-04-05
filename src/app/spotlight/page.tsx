@@ -233,6 +233,73 @@ function VideoPlayer({
   );
 }
 
+/* ─── Reel Card ─── */
+
+function ReelCard({ src, label }: { src: string; label: string }) {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [playing, setPlaying] = useState(false);
+  const [muted, setMuted] = useState(true);
+
+  const toggle = () => {
+    if (!videoRef.current) return;
+    if (playing) {
+      videoRef.current.pause();
+    } else {
+      videoRef.current.play();
+    }
+    setPlaying(!playing);
+  };
+
+  const toggleSound = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!videoRef.current) return;
+    videoRef.current.muted = !muted;
+    setMuted(!muted);
+  };
+
+  return (
+    <div
+      className="group relative aspect-[9/16] overflow-hidden cursor-pointer bg-black"
+      onClick={toggle}
+    >
+      <video
+        ref={videoRef}
+        className="w-full h-full object-cover"
+        muted={muted}
+        loop
+        playsInline
+        preload="metadata"
+      >
+        <source src={src} type="video/mp4" />
+      </video>
+
+      {/* Play overlay */}
+      {!playing && (
+        <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+          <div className="h-14 w-14 border border-gold/50 bg-gold/10 backdrop-blur-sm flex items-center justify-center">
+            <Play className="h-6 w-6 text-gold ml-0.5" />
+          </div>
+        </div>
+      )}
+
+      {/* Sound toggle — bottom right */}
+      {playing && (
+        <button
+          onClick={toggleSound}
+          className="absolute bottom-14 right-3 h-8 w-8 bg-black/50 backdrop-blur-sm flex items-center justify-center text-cream/70 hover:text-gold transition-colors cursor-pointer"
+        >
+          {muted ? <VolumeOff className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
+        </button>
+      )}
+
+      {/* Label — bottom */}
+      <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/80 to-transparent">
+        <p className="text-[10px] tracking-widest uppercase text-gold font-bold">{label}</p>
+      </div>
+    </div>
+  );
+}
+
 /* ─── Page ─── */
 
 export default function SpotlightPage() {
@@ -287,12 +354,50 @@ export default function SpotlightPage() {
       {/* Gold divider */}
       <div className="gold-divider w-full" />
 
-      {/* Videos */}
+      {/* Full Videos */}
       <section className="py-20">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 space-y-24">
           {videos.map((video, i) => (
             <VideoPlayer key={video.id} video={video} index={i} />
           ))}
+        </div>
+      </section>
+
+      <div className="gold-divider w-full" />
+
+      {/* ── Reels Feed ── */}
+      <section className="py-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <FadeIn>
+            <div className="text-center mb-14">
+              <div className="flex items-center justify-center gap-4 mb-6">
+                <div className="h-px w-10 bg-gradient-to-r from-gold to-transparent" />
+                <span className="text-[11px] font-bold tracking-[0.35em] uppercase text-gold">
+                  Reels
+                </span>
+                <div className="h-px w-10 bg-gradient-to-l from-gold to-transparent" />
+              </div>
+              <h2 className="text-3xl sm:text-4xl font-black tracking-tight">
+                Quick <span className="gradient-text-gold">Clips</span>
+              </h2>
+              <p className="mt-3 text-cream/40 max-w-md mx-auto text-sm">
+                Short saxophone moments. Tap to play, tap to unmute.
+              </p>
+            </div>
+          </FadeIn>
+
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            {[
+              { src: "/images/reel-1.mp4", label: "Smooth Jazz Vibes" },
+              { src: "/images/reel-2.mp4", label: "Afrobeats Energy" },
+              { src: "/images/reel-3.mp4", label: "Concert Moment" },
+              { src: "/images/reel-4.mp4", label: "Stage Fire" },
+            ].map((reel, i) => (
+              <FadeIn key={reel.label} delay={i * 0.08}>
+                <ReelCard src={reel.src} label={reel.label} />
+              </FadeIn>
+            ))}
+          </div>
         </div>
       </section>
 

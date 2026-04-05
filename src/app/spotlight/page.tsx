@@ -9,7 +9,6 @@ import {
   VolumeOff,
   ArrowLeft,
   Music,
-  Sparkles,
   ArrowRight,
   Maximize,
 } from "lucide-react";

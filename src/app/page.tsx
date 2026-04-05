@@ -10,25 +10,22 @@ import {
   Star,
   MapPin,
   Clock,
-  Users,
   ArrowRight,
   Headphones,
   PartyPopper,
   Guitar,
-  Disc3,
   Globe,
   AtSign,
   Tv,
   Mail,
   Phone,
   Sparkles,
-  Heart,
   Volume2,
-  Zap,
-  Trophy,
   CirclePlay,
   ArrowUpRight,
   Quote,
+  Trophy,
+  Heart,
 } from "lucide-react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { Navbar } from "@/components/layout/navbar";
@@ -52,10 +49,10 @@ const marqueeWords = [
 ];
 
 const stats = [
-  { value: "500+", label: "Performances" },
-  { value: "50K+", label: "Happy Fans" },
-  { value: "12+", label: "Countries" },
-  { value: "15+", label: "Years" },
+  { value: "500+", label: "Performances", icon: <Mic2 className="h-4 w-4" /> },
+  { value: "50K+", label: "Happy Fans", icon: <Heart className="h-4 w-4" /> },
+  { value: "12+", label: "Countries", icon: <Globe className="h-4 w-4" /> },
+  { value: "15+", label: "Years", icon: <Trophy className="h-4 w-4" /> },
 ];
 
 const services = [
@@ -386,6 +383,24 @@ export default function HomePage() {
                     Listen
                   </button>
                 </a>
+              </div>
+            </FadeIn>
+
+            {/* Stats bar */}
+            <FadeIn delay={0.55}>
+              <div className="mt-20 flex flex-wrap gap-8 sm:gap-12">
+                {stats.map((stat, i) => (
+                  <div key={stat.label} className="flex items-center gap-3">
+                    <div className="text-gold/30">{stat.icon}</div>
+                    <div>
+                      <p className="text-2xl sm:text-3xl font-black gradient-text-gold">{stat.value}</p>
+                      <p className="text-[10px] tracking-[0.2em] uppercase text-cream/25">{stat.label}</p>
+                    </div>
+                    {i < stats.length - 1 && (
+                      <div className="hidden sm:block w-px h-10 bg-gold/10 ml-4" />
+                    )}
+                  </div>
+                ))}
               </div>
             </FadeIn>
           </div>
@@ -877,11 +892,13 @@ export default function HomePage() {
                     {pkg.featured ? "Get Started" : "Learn More"}
                   </button>
 
-                  <ul className="mt-8 space-y-3 flex-1">
+                  <ul className="mt-8 space-y-3.5 flex-1">
                     {pkg.features.map((feature) => (
                       <li key={feature} className="flex items-start gap-3">
-                        <div className="h-1 w-1 rounded-full bg-gold mt-2 flex-shrink-0" />
-                        <span className="text-sm text-cream/40">{feature}</span>
+                        <svg className={cn("h-4 w-4 mt-0.5 flex-shrink-0", pkg.featured ? "text-gold" : "text-gold/30")} viewBox="0 0 16 16" fill="none">
+                          <path d="M3 8.5L6.5 12L13 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="square" />
+                        </svg>
+                        <span className="text-sm text-cream/50">{feature}</span>
                       </li>
                     ))}
                   </ul>
@@ -1072,9 +1089,14 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-10 mb-16">
             <div className="col-span-2 md:col-span-1">
-              <p className="text-2xl font-black tracking-tight mb-4">
-                BAYO<span className="text-gold">.</span>
-              </p>
+              <div className="flex items-center gap-3 mb-4">
+                <div className="h-9 w-9 border border-gold/20 flex items-center justify-center text-gold">
+                  <Music className="h-4 w-4" />
+                </div>
+                <p className="text-2xl font-black tracking-tight">
+                  BAYO<span className="text-gold">.</span>
+                </p>
+              </div>
               <p className="text-xs text-cream/20 leading-relaxed">
                 World-class saxophone performances.
                 <br />

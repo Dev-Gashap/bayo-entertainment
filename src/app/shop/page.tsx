@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import {
   ArrowLeft,
   ShoppingBag,
@@ -12,100 +13,11 @@ import {
   Truck,
   Shield,
   CreditCard,
-  Disc3,
-  Disc,
-  Shirt,
-  Download,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Navbar } from "@/components/layout/navbar";
 import { cn } from "@/lib/utils";
 import { products, type Product } from "@/lib/shop-data";
-
-/* ─── Product icon renderer ─── */
-function ProductIcon({ type, className }: { type: string; className?: string }) {
-  const cls = cn("text-gold/70", className);
-  switch (type) {
-    case "vinyl":
-      return (
-        <div className="relative">
-          <Disc3 className={cn(cls, "animate-spin-slow")} />
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="h-3 w-3 rounded-full bg-gold/20" />
-          </div>
-        </div>
-      );
-    case "cd":
-      return <Disc className={cls} />;
-    case "tshirt":
-      return <Shirt className={cls} />;
-    case "hoodie":
-      return (
-        <svg className={cls} viewBox="0 0 64 64" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M22 10L10 18V30H18V54H46V30H54V18L42 10" />
-          <path d="M22 10C22 10 26 16 32 16C38 16 42 10 42 10" />
-          <path d="M22 10L26 6H38L42 10" />
-        </svg>
-      );
-    case "download":
-      return <Download className={cls} />;
-    case "cap":
-      return (
-        <svg className={cls} viewBox="0 0 64 64" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M8 36C8 36 12 24 32 24C52 24 56 36 56 36" />
-          <path d="M8 36C8 36 8 44 32 44C56 44 56 36 56 36" />
-          <path d="M56 36H62" />
-          <path d="M20 24V18C20 18 24 12 32 12C40 12 44 18 44 18V24" />
-        </svg>
-      );
-    default:
-      return <Music className={cls} />;
-  }
-}
-
-/* ─── Product visual card ─── */
-function ProductVisual({ product, size = "md" }: { product: Product; size?: "sm" | "md" }) {
-  const iconSize = size === "sm" ? "h-10 w-10" : "h-16 w-16";
-  return (
-    <div className={cn("relative bg-gradient-to-br flex items-center justify-center overflow-hidden", product.gradient, size === "sm" ? "h-full w-full" : "aspect-square w-full")}>
-      {/* Decorative circles */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[200%] h-[200%] opacity-[0.03]">
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div className="w-40 h-40 rounded-full border border-white" />
-        </div>
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div className="w-64 h-64 rounded-full border border-white" />
-        </div>
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div className="w-96 h-96 rounded-full border border-white" />
-        </div>
-      </div>
-      {/* Grid overlay */}
-      <div className="absolute inset-0 opacity-[0.03]" style={{
-        backgroundImage: "linear-gradient(rgba(201,168,76,1) 1px, transparent 1px), linear-gradient(90deg, rgba(201,168,76,1) 1px, transparent 1px)",
-        backgroundSize: "30px 30px",
-      }} />
-      {/* Product name watermark */}
-      <div className="absolute bottom-4 left-4 right-4">
-        <p className="text-[9px] tracking-[0.3em] uppercase text-white/10 font-bold truncate">{product.name}</p>
-      </div>
-      {/* Icon */}
-      <div className="relative z-10">
-        <ProductIcon type={product.icon} className={iconSize} />
-      </div>
-      {/* Badge */}
-      {product.badge && (
-        <div className="absolute top-3 left-3 px-3 py-1 bg-gold text-charcoal text-[9px] font-bold tracking-widest uppercase z-10">
-          {product.badge}
-        </div>
-      )}
-      {/* BAYO. branding */}
-      <div className="absolute top-3 right-3 text-[10px] font-black text-white/10 tracking-tight">
-        BAYO<span className="text-gold/20">.</span>
-      </div>
-    </div>
-  );
-}
 
 interface CartItem {
   product: Product;
@@ -219,17 +131,40 @@ export default function ShopPage() {
       {/* Products grid */}
       <section className="py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
             {filtered.map((product, i) => (
               <FadeIn key={product.id} delay={i * 0.06}>
-                <div className="group border border-gold/5 hover:border-gold/20 transition-all duration-500">
-                  <div className="cursor-pointer" onClick={() => { setSelectedProduct(product); setSelectedVariant(product.variants?.[0] || ""); }}>
-                    <ProductVisual product={product} />
+                <div className="group border border-gold/5 hover:border-gold/20 transition-all duration-500 h-full flex flex-col">
+                  {/* Product image */}
+                  <div
+                    className="relative aspect-square overflow-hidden cursor-pointer bg-[#161310]"
+                    onClick={() => { setSelectedProduct(product); setSelectedVariant(product.variants?.[0] || ""); }}
+                  >
+                    <Image
+                      src={product.image}
+                      alt={product.name}
+                      fill
+                      className="object-cover transition-transform duration-700 group-hover:scale-105"
+                      style={{ objectPosition: product.imagePos }}
+                      quality={80}
+                    />
+                    <div className="absolute inset-0 bg-black/10 group-hover:bg-black/0 transition-all duration-500" />
+                    {/* BAYO. watermark */}
+                    <div className="absolute bottom-3 right-3 text-[10px] font-black text-white/20 tracking-tight">
+                      BAYO<span className="text-gold/30">.</span>
+                    </div>
+                    {product.badge && (
+                      <div className="absolute top-3 left-3 px-3 py-1 bg-gold text-charcoal text-[9px] font-bold tracking-widest uppercase">
+                        {product.badge}
+                      </div>
+                    )}
                   </div>
-                  <div className="p-5">
+
+                  {/* Info */}
+                  <div className="p-5 flex flex-col flex-1">
                     <p className="text-[10px] tracking-wider uppercase text-cream/20 mb-1.5">{product.category}</p>
-                    <h3 className="font-bold text-sm mb-2 group-hover:text-gold-light transition-colors">{product.name}</h3>
-                    <div className="flex items-center justify-between mt-4">
+                    <h3 className="font-bold text-sm mb-2 group-hover:text-gold-light transition-colors flex-1">{product.name}</h3>
+                    <div className="flex items-center justify-between mt-3">
                       <span className="text-xl font-black gradient-text-gold">${product.price.toFixed(2)}</span>
                       <button onClick={() => addToCart(product, product.variants?.[0])}
                         className={cn("px-4 py-2 text-[10px] tracking-wider uppercase font-bold transition-all cursor-pointer",
@@ -261,7 +196,21 @@ export default function ShopPage() {
                   <X className="h-5 w-5" />
                 </button>
                 <div className="grid sm:grid-cols-2">
-                  <ProductVisual product={selectedProduct} />
+                  <div className="relative aspect-square bg-[#161310]">
+                    <Image
+                      src={selectedProduct.image}
+                      alt={selectedProduct.name}
+                      fill
+                      className="object-cover"
+                      style={{ objectPosition: selectedProduct.imagePos }}
+                      quality={85}
+                    />
+                    {selectedProduct.badge && (
+                      <div className="absolute top-3 left-3 px-3 py-1 bg-gold text-charcoal text-[9px] font-bold tracking-widest uppercase">
+                        {selectedProduct.badge}
+                      </div>
+                    )}
+                  </div>
                   <div className="p-6 sm:p-8 flex flex-col">
                     <p className="text-[10px] tracking-wider uppercase text-cream/20 mb-2">{selectedProduct.category}</p>
                     <h3 className="text-xl font-black mb-3">{selectedProduct.name}</h3>
@@ -326,8 +275,14 @@ export default function ShopPage() {
                 ) : (
                   cart.map((item, i) => (
                     <div key={`${item.product.id}-${item.variant}`} className="flex gap-4 py-4 border-b border-gold/5">
-                      <div className="h-20 w-20 flex-shrink-0 overflow-hidden">
-                        <ProductVisual product={item.product} size="sm" />
+                      <div className="relative h-20 w-20 flex-shrink-0 overflow-hidden bg-[#161310]">
+                        <Image
+                          src={item.product.image}
+                          alt={item.product.name}
+                          fill
+                          className="object-cover"
+                          style={{ objectPosition: item.product.imagePos }}
+                        />
                       </div>
                       <div className="flex-1 min-w-0">
                         <h4 className="font-bold text-sm truncate">{item.product.name}</h4>

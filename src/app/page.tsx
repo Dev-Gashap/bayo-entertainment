@@ -602,7 +602,8 @@ export default function HomePage() {
           src="/images/lounge.jpeg"
           alt="Bayo in a relaxed setting with saxophone"
           fill
-          className="object-cover object-top"
+          className="object-cover"
+          style={{ objectPosition: "center 30%" }}
           quality={90}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-[#0d0b08] via-[#0d0b08]/40 to-[#0d0b08]/50" />

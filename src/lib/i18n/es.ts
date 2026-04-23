@@ -7,6 +7,7 @@ export const es = {
     shop: "Tienda",
     reviews: "Rese\u00F1as",
     contact: "Contacto",
+    chat: "Chatear",
     bookNow: "Reservar",
   },
 

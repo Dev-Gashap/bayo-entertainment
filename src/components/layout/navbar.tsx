@@ -14,7 +14,7 @@ const navLinks = [
   { href: "/blog", key: "blog" as const },
   { href: "/shop", key: "shop" as const },
   { href: "/reviews", key: "reviews" as const },
-  { href: "#contact", key: "contact" as const },
+  { href: "/chat", key: "chat" as const },
 ];
 
 export function Navbar() {

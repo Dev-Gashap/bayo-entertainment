@@ -8,6 +8,7 @@ export const en = {
     shop: "Shop",
     reviews: "Reviews",
     contact: "Contact",
+    chat: "Chat",
     bookNow: "Book Now",
   },
 

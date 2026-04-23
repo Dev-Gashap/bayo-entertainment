@@ -13,6 +13,7 @@ const navLinks = [
   { href: "#music", key: "music" as const },
   { href: "/blog", key: "blog" as const },
   { href: "/shop", key: "shop" as const },
+  { href: "/quote", key: "quote" as const },
   { href: "/reviews", key: "reviews" as const },
   { href: "/chat", key: "chat" as const },
 ];

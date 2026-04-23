@@ -40,50 +40,6 @@ const quickActions = [
   { icon: <Headphones className="h-3.5 w-3.5" />, label: "Song requests", message: "Can Bayo play specific songs at my event? I have a list I'd love to share." },
 ];
 
-/* ─── Automated agent responses ─── */
-const agentResponses: Record<string, string[]> = {
-  availability: [
-    "Thanks for reaching out! 🎷 Bayo is currently booking for events through 2026.",
-    "Could you share the date you have in mind and the city/location? I'll check his calendar right away.",
-  ],
-  pricing: [
-    "Great question! Our packages start at:",
-    "• Intimate (solo sax, 2hrs): $1,500\n• Premium (full set, 4hrs): $3,500\n• Headline (concert/gala): Custom quote",
-    "The final price depends on your event type, location, and duration. Want me to put together a custom quote for you?",
-  ],
-  booking: [
-    "Awesome, let's get you booked! 🎵",
-    "To get started, I'll need a few details:\n\n1. Event date\n2. Event type (wedding, corporate, party, etc.)\n3. Location (city & venue if known)\n4. Estimated guest count\n5. Any special requests",
-    "Feel free to share whatever you have and we'll work out the rest!",
-  ],
-  songs: [
-    "Absolutely! Bayo can play a wide range of genres on saxophone:",
-    "🎶 Jazz, R&B, Afrobeats, Gospel, Highlife, Amapiano, Pop, Soul, and more.",
-    "Send over your song list and we'll let you know which ones Bayo can perform. He also takes requests during live shows!",
-  ],
-  default: [
-    "Thanks for your message! A member of Bayo's team will respond shortly.",
-    "In the meantime, you can also:\n\n• Call us: +1 (832) 555-BAYO\n• Email: hello@bayoentertainment.com\n• Book online: bayoentertainment.com/book",
-  ],
-};
-
-function getAgentResponse(message: string): string[] {
-  const lower = message.toLowerCase();
-  if (lower.includes("availability") || lower.includes("available") || lower.includes("date") || lower.includes("when")) {
-    return agentResponses.availability;
-  }
-  if (lower.includes("pricing") || lower.includes("price") || lower.includes("cost") || lower.includes("how much") || lower.includes("package")) {
-    return agentResponses.pricing;
-  }
-  if (lower.includes("book") || lower.includes("reserve") || lower.includes("hire") || lower.includes("event")) {
-    return agentResponses.booking;
-  }
-  if (lower.includes("song") || lower.includes("play") || lower.includes("request") || lower.includes("genre") || lower.includes("music")) {
-    return agentResponses.songs;
-  }
-  return agentResponses.default;
-}
-
 function getTimeString() {
   return new Date().toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true });
 }
@@ -125,7 +81,7 @@ export default function ChatPage() {
     scrollToBottom();
   }, [messages, isTyping]);
 
-  const sendMessage = (text: string) => {
+  const sendMessage = async (text: string) => {
     if (!text.trim()) return;
 
     const userMsg: Message = {
@@ -136,39 +92,118 @@ export default function ChatPage() {
       status: "sent",
     };
 
+    // Build conversation history for the API (user/assistant turns only — skip welcome messages)
+    const history: { role: "user" | "assistant"; content: string }[] = messages
+      .filter((m) => !m.id.startsWith("welcome-"))
+      .map((m) => ({
+        role: m.sender === "user" ? ("user" as const) : ("assistant" as const),
+        content: m.text,
+      }));
+    history.push({ role: "user", content: userMsg.text });
+
     setMessages((prev) => [...prev, userMsg]);
     setInput("");
 
-    // Update to delivered
+    // Animate status: sent → delivered → read
     setTimeout(() => {
       setMessages((prev) =>
-        prev.map((m) => m.id === userMsg.id ? { ...m, status: "delivered" } : m)
+        prev.map((m) => (m.id === userMsg.id ? { ...m, status: "delivered" } : m))
       );
-    }, 500);
+    }, 400);
 
-    // Update to read
     setTimeout(() => {
       setMessages((prev) =>
-        prev.map((m) => m.id === userMsg.id ? { ...m, status: "read" } : m)
+        prev.map((m) => (m.id === userMsg.id ? { ...m, status: "read" } : m))
       );
       setIsTyping(true);
-    }, 1000);
+    }, 800);
 
-    // Agent responses
-    const responses = getAgentResponse(text);
-    responses.forEach((response, i) => {
-      setTimeout(() => {
-        if (i === responses.length - 1) setIsTyping(false);
-        const agentMsg: Message = {
+    // Create a streaming agent message
+    const agentMsgId = nextId();
+
+    try {
+      const res = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ messages: history }),
+      });
+
+      if (!res.ok || !res.body) {
+        throw new Error(`API error: ${res.status}`);
+      }
+
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = "";
+      let firstChunk = true;
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split("\n\n");
+        buffer = lines.pop() ?? "";
+
+        for (const line of lines) {
+          if (!line.startsWith("data: ")) continue;
+          const data = line.slice(6).trim();
+          if (!data) continue;
+
+          try {
+            const parsed = JSON.parse(data) as
+              | { type: "text"; text: string }
+              | { type: "done"; usage: unknown }
+              | { type: "error"; error: string };
+
+            if (parsed.type === "text") {
+              if (firstChunk) {
+                setIsTyping(false);
+                setMessages((prev) => [
+                  ...prev,
+                  {
+                    id: agentMsgId,
+                    sender: "agent",
+                    text: parsed.text,
+                    time: getTimeString(),
+                    status: "read",
+                  },
+                ]);
+                firstChunk = false;
+              } else {
+                setMessages((prev) =>
+                  prev.map((m) =>
+                    m.id === agentMsgId
+                      ? { ...m, text: m.text + parsed.text }
+                      : m
+                  )
+                );
+              }
+            } else if (parsed.type === "error") {
+              throw new Error(parsed.error);
+            }
+          } catch {
+            // Malformed chunk — ignore and continue
+          }
+        }
+      }
+
+      setIsTyping(false);
+    } catch (err) {
+      setIsTyping(false);
+      const errText =
+        err instanceof Error ? err.message : "Something went wrong";
+      setMessages((prev) => [
+        ...prev,
+        {
           id: nextId(),
           sender: "agent",
-          text: response,
+          text: `Apologies — I'm having trouble connecting right now. Please try again in a moment, or reach out to us directly at hello@bayoentertainment.com. (${errText})`,
           time: getTimeString(),
           status: "read",
-        };
-        setMessages((prev) => [...prev, agentMsg]);
-      }, 1500 + i * 1200);
-    });
+        },
+      ]);
+    }
   };
 
   const handleSubmit = (e: React.FormEvent) => {

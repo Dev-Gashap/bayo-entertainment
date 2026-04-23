@@ -8,6 +8,7 @@ export const fr = {
     reviews: "Avis",
     contact: "Contact",
     chat: "Discuter",
+    quote: "Devis",
     bookNow: "R\u00E9server",
   },
 
